@@ -29,12 +29,14 @@
       .container {
           position: absolute;
           top: 0;
+          max-width: 1000px;
       }
       button {
          position: relative;
-         width: 150px;
+         width: 140px;
          height: 40px;
          margin-right: 10px;
+         margin-bottom: 10px;
       }
   </style>
   </head>
@@ -44,24 +46,14 @@
     </noscript>
     <div id="root"></div>
     <div class="container">
+        <button id="start">播放</button>
       <button id="pause">暂停</button>
-      <button id="begin">继续</button>
+      <button id="continue">继续</button>
       <button id="hide">隐藏</button>
       <button id="display">显示</button>
-      <button id="play">播放视频</button>
-      <button id="video-length">显示视频长度</button>
+      <button id="play">从头播放视频</button>
+      <button id="video-length">显示视频长度和名字</button>
+      <button id="delete">删除</button>
   </div>
-  <div id="output">
-      </div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>

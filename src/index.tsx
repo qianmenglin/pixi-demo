@@ -1,19 +1,20 @@
 import registerServiceWorker from './registerServiceWorker';
 import * as P from 'pixi.js';
 import star from '../src/assets/star.png';
-import test_48 from '../src/assets/test-48.mp4';
+//import test_34 from '../src/assets/test-34.mp4';
+import test from '../src/assets/test.webm';
 
 const app = new P.Application(1000, 800, {backgroundColor : 21451655});
+
+console.log(star);
 
 document.body.appendChild(app.view);
 
 const actor = P.Sprite.fromImage(star);
-const video_basetexture = P.VideoBaseTexture.fromUrl({src: test_48, mime: 'video/mp4'}, false);
-const video_texture1 = new P.Texture(video_basetexture);
-const video_actor1 = new P.Sprite(video_texture1);
-
-const graphics = new P.Graphics();
+const time_graphics = new P.Graphics();
+const name_graphics = new P.Graphics();
 const time_text = new P.Text();
+const name_text = new P.Text();
 const TIME_TEXT_STYLE = new PIXI.TextStyle({
     fontFamily: ['STHeitiSC-Medium', 'Microsoft YaHei'],
     fontSize: '16px',
@@ -21,6 +22,12 @@ const TIME_TEXT_STYLE = new PIXI.TextStyle({
     align: 'center',
     fill: '#ffffff',
   });
+const video_basetexture = P.VideoBaseTexture.fromUrl({src: test, mime: 'video/mp4'}, false);
+const video_texture1 = new P.Texture(video_basetexture);
+const video_actor1 = new P.Sprite(video_texture1);
+const first_frame_canvas = document.createElement('canvas');
+const ctx = first_frame_canvas.getContext('2d') as any;
+
 
 actor.x = app.renderer.width / 2;
 actor.y = app.renderer.height / 2;
@@ -34,14 +41,11 @@ video_actor1.y = app.renderer.height / 2;
 video_actor1.anchor.x = 0.5;
 video_actor1.anchor.y = 0.5;
 
-video_basetexture.on('loaded', set_video_actor_size);
+(video_basetexture as any).source.playbackRate = 10;
 
-console.log('texture', video_texture1);
-console.log('texture', video_texture1.frame);
-console.log(video_basetexture);
+video_basetexture.on('loaded', set_video_actor);
 
-
-function begin() {
+function continue_video() {
     video_basetexture.source.play();
 }
 
@@ -58,31 +62,19 @@ function display() {
 }
 
 function play() {
-    //从第一桢开始播放
+    //play by first frame
     video_basetexture.source.currentTime = 0;
-    //video_basetexture.updateSourceImage('../src/assets/star.png');
 }
 
-function set_video_actor_size() {
-    //readonly video_basetexture.source.poster = '../src/assets/star.png';
+function set_video_actor() {
+    //set size
     const ratio_width = app.renderer.width / video_basetexture.width > 1 ? 1 : app.renderer.width / video_basetexture.width;
     const ratio_height = app.renderer.height / video_basetexture.height > 1 ? 1 : app.renderer.height / video_basetexture.height;
     const ratio = Math.min(ratio_width, ratio_height);
     video_actor1.width *= ratio;
     video_actor1.height *= ratio;
 
-    const output = document.getElementById('output') as HTMLElement;
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d') as any;
-    const video_source = video_basetexture.source as HTMLVideoElement;
-    console.log(typeof(video_source));
-    canvas.width = video_actor1.width * (video_actor1.scale as any);
-    canvas.height = video_actor1.height * (video_actor1.scale as any);
-    ctx.drawImage(video_source, 0, 0, canvas.width, canvas.height);
-
-    const image = document.createElement('img');
-    image.src = canvas.toDataURL();
-    output.appendChild(image);
+    save_first_frame_image();
 }
 
 function get_all_video_time() {
@@ -90,42 +82,105 @@ function get_all_video_time() {
     const minute = Math.floor(sum_seconds / 60 % 60);
     const second = Math.floor(sum_seconds % 60);
     const time = minute + '分' + second + '秒';
-    graphics.x = video_actor1.width / 2;
-    graphics.y = video_actor1.height / 2;
-    graphics.pivot.x = graphics.x / 2;
-    graphics.pivot.y = graphics.y / 2;
-    graphics.lineStyle(2, 0xCCCCCC, 1);
-    graphics.beginFill(0x999999);
-    graphics.drawRect(0, 0, 80, 40);
-    graphics.endFill();
+    time_graphics.x = video_actor1.width / 2;
+    time_graphics.y = video_actor1.height / 2;
+    time_graphics.pivot.x = time_graphics.x / 4;
+    time_graphics.pivot.y = time_graphics.y / 4;
+    time_graphics.lineStyle(2, 0xCCCCCC, 1);
+    time_graphics.beginFill(0x999999);
+    time_graphics.drawRect(0, 0, 80, 40);
+    time_graphics.endFill();
     time_text.text = time;
     time_text.style = TIME_TEXT_STYLE;
-    time_text.x = graphics.width / 2;
-    time_text.y = graphics.height / 2;
+    time_text.x = time_graphics.width / 2;
+    time_text.y = time_graphics.height / 2;
     time_text.anchor.x = 0.5;
     time_text.anchor.y = 0.5
-    graphics.addChild(time_text); 
+    video_name();
+    time_graphics.addChild(time_text);
 }
 
-//video_basetexture.on('loaded', get_all_video_time());
-//const time_string = get_all_video_time();
+function save_first_frame_image() {
+    if ((video_basetexture as any).source.currentTime == 0) {
+        const video = video_basetexture.source;
+        first_frame_canvas.width = video_basetexture.width;
+        first_frame_canvas.height = video_basetexture.height;
+        ctx.drawImage(video, 0, 0, first_frame_canvas.width, first_frame_canvas.height);
 
+        document.body.appendChild(first_frame_canvas);
+    }
+}
+
+function video_name() {
+    //todo: get video name from backend url?
+    const name = 'test-34';
+    name_graphics.x = - video_actor1.width / 2;
+    name_graphics.y = video_actor1.height / 2;
+    name_graphics.pivot.x = - name_graphics.x / 4;
+    name_graphics.pivot.y = name_graphics.y / 4;
+    name_graphics.lineStyle(2, 0xCCCCCC, 1);
+    name_graphics.beginFill(0x999999);
+    name_graphics.drawRect(0, 0, 80, 40);
+    name_graphics.endFill();
+    name_text.text = name;
+    name_text.style = TIME_TEXT_STYLE;
+    name_text.x = name_graphics.width / 2;
+    name_text.y = name_graphics.height / 2;
+    name_text.anchor.x = 0.5;
+    name_text.anchor.y = 0.5
+    name_graphics.addChild(name_text); 
+}
+
+function delete_video() {
+    app.stage.removeChild(video_actor1);
+}
+
+
+if (video_actor1.getChildByName('frame_sprite')) {
+    const child = video_actor1.getChildByName('frame_sprite');
+    video_actor1.removeChild(child);
+}
+
+console.log(video_basetexture);
+console.log(video_actor1);
+
+(video_basetexture as any).source.addEventListener('ended', () => {
+    const frame_sprite = P.Sprite.from(first_frame_canvas);
+    frame_sprite.anchor.x = 0.5;
+    frame_sprite.anchor.y = 0.5;
+    frame_sprite.name = 'frame_sprite';
+    video_actor1.addChild(frame_sprite); 
+    video_actor1.setChildIndex(frame_sprite, 0);
+})
+
+//上传后显示第一桢图片
+
+
+function start_video() {
+
+}
+
+const start_btn = document.getElementById('start') as HTMLElement;
 const pause_btn = document.getElementById('pause') as HTMLElement;
-const begin_btn = document.getElementById('begin') as HTMLElement;
+const continue_btn = document.getElementById('continue') as HTMLElement;
 const hide_btn = document.getElementById('hide') as HTMLElement;
 const display_btn = document.getElementById('display') as HTMLElement;
 const play_btn = document.getElementById('play') as HTMLElement;
 const video_length_btn = document.getElementById('video-length') as HTMLElement;
+const delete_btn = document.getElementById('delete') as HTMLElement;
 
 pause_btn.addEventListener('click', pause);
-begin_btn.addEventListener('click', begin);
+continue_btn.addEventListener('click', continue_video);
 hide_btn.addEventListener('click', hide);
 display_btn.addEventListener('click', display);
 play_btn.addEventListener('click', play);
 video_length_btn.addEventListener('click', get_all_video_time);
+delete_btn.addEventListener('click', delete_video);
+start_btn.addEventListener('click', start_video);
 
 app.stage.addChild(actor);
 app.stage.addChild(video_actor1);
-video_actor1.addChild(graphics);
+video_actor1.addChild(time_graphics);
+video_actor1.addChild(name_graphics);
 
 registerServiceWorker();
