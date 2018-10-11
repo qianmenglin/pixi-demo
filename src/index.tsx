@@ -1,10 +1,11 @@
 import registerServiceWorker from './registerServiceWorker';
 import * as P from 'pixi.js';
 import star from '../src/assets/star.png';
-//import test_34 from '../src/assets/test-34.mp4';
-import test from '../src/assets/test.webm';
+import test_34 from '../src/assets/test-34.mp4';
+//import test from '../src/assets/test.webm';
 
-const app = new P.Application(1000, 800, {backgroundColor : 21451655});
+function start_video() {
+const app = new P.Application(400, 800, {backgroundColor : 21451655});
 
 console.log(star);
 
@@ -22,7 +23,7 @@ const TIME_TEXT_STYLE = new PIXI.TextStyle({
     align: 'center',
     fill: '#ffffff',
   });
-const video_basetexture = P.VideoBaseTexture.fromUrl({src: test, mime: 'video/mp4'}, false);
+const video_basetexture = P.VideoBaseTexture.fromUrl({src: test_34, mime: 'video/mp4'}, false);
 const video_texture1 = new P.Texture(video_basetexture);
 const video_actor1 = new P.Sprite(video_texture1);
 const first_frame_canvas = document.createElement('canvas');
@@ -153,14 +154,7 @@ console.log(video_actor1);
     video_actor1.setChildIndex(frame_sprite, 0);
 })
 
-//上传后显示第一桢图片
 
-
-function start_video() {
-
-}
-
-const start_btn = document.getElementById('start') as HTMLElement;
 const pause_btn = document.getElementById('pause') as HTMLElement;
 const continue_btn = document.getElementById('continue') as HTMLElement;
 const hide_btn = document.getElementById('hide') as HTMLElement;
@@ -176,11 +170,13 @@ display_btn.addEventListener('click', display);
 play_btn.addEventListener('click', play);
 video_length_btn.addEventListener('click', get_all_video_time);
 delete_btn.addEventListener('click', delete_video);
-start_btn.addEventListener('click', start_video);
 
 app.stage.addChild(actor);
 app.stage.addChild(video_actor1);
 video_actor1.addChild(time_graphics);
 video_actor1.addChild(name_graphics);
+}
 
+const start_btn = document.getElementById('start') as HTMLElement;
+start_btn.addEventListener('click', start_video);
 registerServiceWorker();
